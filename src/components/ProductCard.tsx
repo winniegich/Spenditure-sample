@@ -1,33 +1,41 @@
-import React from 'react';
-import useStore from '../store';
-import type { Product } from '../api';
+import React from "react";
+import type { Product } from "../api/index.ts";
+import useStore from "../store";
 
 interface Props {
   product: Product;
 }
 
 const ProductCard: React.FC<Props> = ({ product }) => {
-  const { items, buyItem, sellItem } = useStore();
+  const buyItem = useStore(state => state.buyItem);
+  const sellItem = useStore(state => state.sellItem);
+  const items = useStore(state => state.items);
 
-  const quantity = items[product.id] ?? 0;
+  const amount = items[product.id] || 0;
 
   return (
-    <div className="border p-4 flex flex-col items-center gap-2 max-w-xs">
-      <img src={product.imageUrl} alt={product.name} className="h-36 w-full object-cover rounded" />
-      <h3 className="font-bold text-lg text-center">{product.name}</h3>
-      <p className="text-green-600 font-semibold">${product.price.toLocaleString()}</p>
-      <div className="flex justify-center items-center gap-3 w-full mt-2">
+    <div className="bg-white shadow-md rounded-lg p-4 w-64 text-center">
+      <img
+        src={product.imageUrl}
+        alt={product.name}
+        className="w-full h-40 object-cover rounded-md"
+      />
+      <h2 className="text-lg font-semibold mt-3">{product.name}</h2>
+      <p className="text-green-600 font-bold">${product.price.toLocaleString()}</p>
+      <div className="flex justify-between items-center mt-4">
         <button
-          disabled={quantity === 0}
+          className={`px-4 py-1 rounded text-white ${
+            amount > 0 ? "bg-red-500 hover:bg-red-700" : "bg-gray-400 cursor-not-allowed"
+          }`}
           onClick={() => sellItem(product.id, product.price)}
-          className={`py-1 px-4 rounded disabled:bg-gray-400 bg-gray-600 text-white`}
+          disabled={amount === 0}
         >
           Sell
         </button>
-        <span className="font-semibold">{quantity}</span>
+        <span className="font-bold">{amount}</span>
         <button
+          className="bg-green-500 text-white px-4 py-1 rounded"
           onClick={() => buyItem(product.id, product.price)}
-          className="py-1 px-4 rounded bg-green-700 hover:bg-green-800 text-white"
         >
           Buy
         </button>
